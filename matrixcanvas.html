@@ -2,6 +2,15 @@
 <html>
   <head>
     <title>Matrix Canvas</title>
+		<style type="text/css">/*<![CDATA[*/
+		html, body {
+			height: 100%;
+			width: 100%;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+		/*]]>*/</style>
     <script type="text/javascript">//<![CDATA[
       "use strict";
 
@@ -12,6 +21,9 @@
 			var MATRIX_CHARS = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン";
 
       function initMatrix(canvas){
+				canvas.width = document.body.clientWidth;
+				canvas.height = document.body.clientHeight;
+
         canvas.ctx = canvas.getContext("2d");
 				canvas.ctx.fillStyle = "#000000";
 				canvas.ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -73,7 +85,18 @@
 				return Math.floor(Math.random() * (max + 1));
 			}
 
-			window.addEventListener("load", function(){document.querySelectorAll("canvas.matrix").forEach(initMatrix);});
+			window.addEventListener("load", function(){
+				document.querySelectorAll("canvas.matrix").forEach(initMatrix);
+				window.addEventListener("resize", function(){
+					document.querySelectorAll("canvas.matrix").forEach(function(canvas){
+						canvas.width = document.body.clientWidth;
+						canvas.height = document.body.clientHeight;
+
+						canvas.ctx.fillStyle = "#000000";
+						canvas.ctx.fillRect(0,0,canvas.width,canvas.height);
+					});
+				});
+			});
     //]]></script>
   </head>
   <body>
