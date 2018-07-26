@@ -14,15 +14,17 @@
     <script type="text/javascript">//<![CDATA[
       "use strict";
 
-			var STRIP_INTERVAL = 50;
+			var STRIP_INTERVAL = 100;
 			var LETTER_INTERVAL = 50;
 
-			//var MATRIX_CHARS = "ABCDEFGHIKLMNOPQRSTUVWXYZ0123456789";
-			var MATRIX_CHARS = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン";
+			var MATRIX_CHARS = "ABCDEFGHIKLMNOPQRSTUVWXYZ0123456789";
+			//var MATRIX_CHARS = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン";
 
       function initMatrix(canvas){
 				canvas.width = document.body.clientWidth;
 				canvas.height = document.body.clientHeight;
+
+				canvas.strips = {};
 
         canvas.ctx = canvas.getContext("2d");
 				canvas.ctx.fillStyle = "#000000";
@@ -31,6 +33,7 @@
 				darkenCanvas.call(canvas);
 
 				setInterval(startStrip.bind(canvas), STRIP_INTERVAL);
+				setInterval(advanceStrips.bind(canvas), LETTER_INTERVAL);
       }
 
 			function darkenCanvas(){
@@ -41,16 +44,27 @@
 			}
 
 			function startStrip(){
-				new Strip(this);
+				var strip = new Strip(this);
+				this.strips[strip.stripNo] = strip;
 			}
 
+			var stripCount = 0;
+
 			function Strip(canvas){
+				this.stripNo = stripCount++;
+
 				this.canvas = canvas;
 				this.x = randInt(canvas.width);
 				this.size = randInt(48) + 8;
 				this.font = this.size.toString() + "px monospace";
 
-				this.interval = setInterval(drawLetter.bind(this), LETTER_INTERVAL);
+				//this.interval = setInterval(drawLetter.bind(this), LETTER_INTERVAL);
+			}
+
+			function advanceStrips(){
+				for(var i in this.strips){
+					this.strips[i].drawLetter();
+				}
 			}
 
 			function drawLetter(){
@@ -67,18 +81,21 @@
 				ctx.fillText(this.lastChar, this.x, this.y);
 				this.y += this.size;
 				if(this.y > this.canvas.height + this.size){
-					clearInterval(this.interval);
+					//clearInterval(this.interval);
+					delete this.canvas.strips[this.stripNo];
 				}
 			}
 
 			Strip.prototype = {
+				drawLetter: drawLetter,
 				canvas: null,
 				size: 0,
 				font: null,
 				interval: null,
 				lastChar: null,
 				x: 0,
-				y: 0
+				y: 0,
+				stripNo: 0,
 			};
 
 			function randInt(max){
