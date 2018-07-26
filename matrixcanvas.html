@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Matrix Canvas</title>
+    <script type="text/javascript">//<![CDATA[
+      "use strict";
+
+			var STRIP_INTERVAL = 50;
+			var LETTER_INTERVAL = 50;
+
+			//var MATRIX_CHARS = "ABCDEFGHIKLMNOPQRSTUVWXYZ0123456789";
+			var MATRIX_CHARS = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン";
+
+      function initMatrix(canvas){
+        canvas.ctx = canvas.getContext("2d");
+				canvas.ctx.fillStyle = "#000000";
+				canvas.ctx.fillRect(0,0,canvas.width,canvas.height);
+
+				darkenCanvas.call(canvas);
+
+				setInterval(startStrip.bind(canvas), STRIP_INTERVAL);
+      }
+
+			function darkenCanvas(){
+				this.ctx.fillStyle = "rgba(0,0,0,0.05)";
+				this.ctx.filter = "none";
+				this.ctx.fillRect(0,0,this.width,this.height);
+				requestAnimationFrame(darkenCanvas.bind(this));
+			}
+
+			function startStrip(){
+				new Strip(this);
+			}
+
+			function Strip(canvas){
+				this.canvas = canvas;
+				this.x = randInt(canvas.width);
+				this.size = randInt(48) + 8;
+				this.font = this.size.toString() + "px monospace";
+
+				this.interval = setInterval(drawLetter.bind(this), LETTER_INTERVAL);
+			}
+
+			function drawLetter(){
+				var ctx = this.canvas.ctx;
+				ctx.font = this.font;
+				if(this.lastChar){
+					ctx.filter = "none";
+					ctx.fillStyle = "#00ff00";
+					ctx.fillText(this.lastChar, this.x, this.y - this.size);
+				}
+				ctx.filter = "drop-shadow(0 0 5px #00ff00)";
+				ctx.fillStyle = "#ffffff";
+				this.lastChar = MATRIX_CHARS[randInt(MATRIX_CHARS.length - 1)];
+				ctx.fillText(this.lastChar, this.x, this.y);
+				this.y += this.size;
+				if(this.y > this.canvas.height + this.size){
+					clearInterval(this.interval);
+				}
+			}
+
+			Strip.prototype = {
+				canvas: null,
+				size: 0,
+				font: null,
+				interval: null,
+				lastChar: null,
+				x: 0,
+				y: 0
+			};
+
+			function randInt(max){
+				return Math.floor(Math.random() * (max + 1));
+			}
+
+			window.addEventListener("load", function(){document.querySelectorAll("canvas.matrix").forEach(initMatrix);});
+    //]]></script>
+  </head>
+  <body>
+		<canvas class="matrix" width="1600" height="1200"></canvas>
+  </body>
+</html>
